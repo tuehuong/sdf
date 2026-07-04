@@ -18,7 +18,7 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: 1. Tu Dong Tao File Code Tu Dong Thu Lai (main.py)
+    - name: 1. Tu Dong Tao File Code Phim Tat Chuan (main.py)
       shell: powershell
       run: |
         $code = @'
@@ -32,11 +32,11 @@ jobs:
         from pywinauto import Desktop, Application
         from pynput import mouse, keyboard
 
-        class SmartRetryAutomationApp:
+        class FinalSmartAutomationApp:
             def __init__(self, root):
                 self.root = root
-                self.root.title("Trinh Tu Dong Thu Lai & Dien Du Lieu v9.0")
-                self.root.geometry("720x560")
+                self.root.title("Trinh Tu Dong Hoa Toan Dien v10.0")
+                self.root.geometry("750x600")
                 self.root.resizable(False, False)
                 
                 self.is_spying = False
@@ -45,61 +45,63 @@ jobs:
                 self.proc_pid = None
                 self.desktop = Desktop(backend="uia")
                 
-                self.current_focused_element = None
+                self.current_focused_id = None
+                self.current_focused_type = None
+                self.current_focused_name = None
                 self.typed_buffer = ""
                 
                 self.create_widgets()
                 
+                # Khoi dong trinh lang nghe toan he thong
                 self.mouse_listener = mouse.Listener(on_click=self.on_click)
                 self.keyboard_listener = keyboard.Listener(on_press=self.on_press)
                 self.mouse_listener.start()
                 self.keyboard_listener.start()
 
             def create_widgets(self):
-                # 1. Khung Cau hinh duong dan
+                # 1. Khung duong dan
                 cf = tk.LabelFrame(self.root, text=" 1. Duong dan phan mem can chay ", padx=10, pady=5)
                 cf.pack(fill="x", padx=15, pady=5)
                 tk.Label(cf, text="File (.exe):").grid(row=0, column=0, sticky="w")
-                self.entry_path = tk.Entry(cf, width=58)
+                self.entry_path = tk.Entry(cf, width=60)
                 self.entry_path.grid(row=0, column=1, pady=5, padx=5)
                 self.entry_path.insert(0, r"C:\Windows\notepad.exe")
 
-                # 2. Bang Hien thi Thao tac Quet duoc
-                lf_tree = tk.LabelFrame(self.root, text=" 2. Cay thu thap hanh dong (Tu dong nhan dien ID) ", padx=10, pady=5)
+                # 2. Bang Hien thi hanh dong
+                lf_tree = tk.LabelFrame(self.root, text=" 2. Cay hanh dong da ghi nho (Click chuot & Go chu theo ID) ", padx=10, pady=5)
                 lf_tree.pack(fill="x", padx=15, pady=5)
                 
                 columns = ('action', 'id', 'name', 'value')
-                self.tree = ttk.Treeview(lf_tree, columns=columns, show='headings', height=7)
+                self.tree = ttk.Treeview(lf_tree, columns=columns, show='headings', height=8)
                 self.tree.heading('action', text='Hanh Dong')
                 self.tree.heading('id', text='Automation ID')
                 self.tree.heading('name', text='Ten Linh Kien')
-                self.tree.heading('value', text='Gia tri / Noi dung nhap')
+                self.tree.heading('value', text='Noi dung nhap lieu')
                 
-                self.tree.column('action', width=100)
+                self.tree.column('action', width=110)
                 self.tree.column('id', width=180)
                 self.tree.column('name', width=160)
-                self.tree.column('value', width=220)
+                self.tree.column('value', width=250)
                 self.tree.pack(fill="x", expand=True)
 
-                # 3. Thanh dieu khien (Da bo o nhap thoi gian cho mo app)
-                tf_time = tk.LabelFrame(self.root, text=" 3. Thiet lap thoi gian vong lap ", padx=10, pady=5)
+                # 3. Thiet lap thoi gian ngam va Nut bam
+                tf_time = tk.LabelFrame(self.root, text=" 3. Thiet lap thoi gian ngam ", padx=10, pady=5)
                 tf_time.pack(fill="x", padx=15, pady=5)
-                
-                tk.Label(tf_time, text="Sau khi hoan thanh tat ca thao tac, giu ngam may trong:").grid(row=0, column=0, sticky="w")
+                tk.Label(tf_time, text="Sau khi thao tac xong het, giu ngam may:").grid(row=0, column=0, sticky="w")
                 self.entry_time_loop = tk.Entry(tf_time, width=6)
-                self.entry_time_loop.grid(row=0, column=1, padx=5, pady=2)
+                self.entry_time_loop.grid(row=0, column=1, padx=5)
                 self.entry_time_loop.insert(0, "15")
-                tk.Label(tf_time, text="giay roi tu dong Reset.").grid(row=0, column=2, sticky="w")
+                tk.Label(tf_time, text="giay roi tu dong Reset vong lap.").grid(row=0, column=2, sticky="w")
 
                 tf_btn = tk.Frame(self.root, pady=5)
                 tf_btn.pack(fill="x", padx=15)
-                self.btn_spy = tk.Button(tf_btn, text="🔍 Bat dau Quan sat", font=("Helvetica", 10, "bold"), bg="#bbdefb", width=18, command=self.toggle_spy)
+                self.btn_spy = tk.Button(tf_btn, text="🔴 Lam Mau Thao Tac (F7)", font=("Helvetica", 10, "bold"), bg="#ffcccc", width=22, command=self.toggle_spy)
                 self.btn_spy.pack(side="left", padx=5)
-                self.btn_run = tk.Button(tf_btn, text="▶️ Chay Tu Dong Thich Ung", font=("Helvetica", 10, "bold"), bg="#c8e6c9", width=24, command=self.toggle_run)
+                self.btn_run = tk.Button(tf_btn, text="▶️ Chay Tu Dong Auto (F8)", font=("Helvetica", 10, "bold"), bg="#ccffcc", width=22, command=self.toggle_run)
                 self.btn_run.pack(side="left", padx=5)
 
-                # 4. Log nhat ky
-                lf_log = tk.LabelFrame(self.root, text=" 4. Tien trinh thuc thi tu dong thong minh ")
+                # 4. Nhat ky log
+                lf_log = tk.LabelFrame(self.root, text=" 4. Nhat ky thuc thi tu dong thong minh ")
                 lf_log.pack(fill="both", expand=True, padx=15, pady=5)
                 self.log_text = tk.Text(lf_log, height=6, state="disabled", bg="#f5f5f5", font=("Consolas", 9))
                 self.log_text.pack(fill="both", expand=True, padx=5, pady=5)
@@ -114,22 +116,23 @@ jobs:
                 if not self.is_spying:
                     if self.is_running: return
                     self.spy_logs.clear()
-                    self.current_focused_element = None
+                    self.current_focused_id = None
                     self.typed_buffer = ""
                     for item in self.tree.get_children(): self.tree.delete(item)
                     self.is_spying = True
-                    self.btn_spy.config(text="⏹️ Dung Quan sat", bg="#ffcdd2")
-                    self.write_log("🔍 [QUAN SAT MO]: Hay click cac tab va nhap lieu lam mau...")
+                    self.btn_spy.config(text="⏹️ Dung Lam Mau (F7)", bg="#ff3333", fg="white")
+                    self.write_log("🔴 [F7 - DANG GHI MAU]: Hay click Mo Tab va GO CHU vao cac o nhap lieu thoai mai...")
                 else:
-                    self.save_current_typing_buffer()
+                    self.check_and_save_buffer()
                     self.is_spying = False
-                    self.btn_spy.config(text="🔍 Bat dau Quan sat", bg="#bbdefb")
-                    self.write_log(f"⏹️ DUNG QUAN SAT. Da ghi nho {len(self.spy_logs)} buoc hanh dong.")
+                    self.btn_spy.config(text="🔴 Lam Mau Thao Tac (F7)", bg="#ffcccc", fg="black")
+                    self.write_log(f"⏹️ DA LUU MAU: He thong ghi nho duoc {len(self.spy_logs)} buoc hanh dong.")
 
             def on_click(self, x, y, button, pressed):
                 if self.is_spying and pressed:
                     try:
-                        self.save_current_typing_buffer()
+                        self.check_and_save_buffer() # Truoc khi sang o moi, kiem tra o cu xem co go chu gi khong
+                        
                         element = self.desktop.from_point(x, y)
                         info = element.element_info
                         
@@ -137,8 +140,11 @@ jobs:
                         name = info.name if info.name else "N/A"
                         c_type = info.control_type if info.control_type else "N/A"
                         
-                        self.current_focused_element = {'automation_id': a_id, 'name': name, 'control_type': c_type}
+                        self.current_focused_id = a_id
+                        self.current_focused_type = c_type
+                        self.current_focused_name = name
                         
+                        # Mac dinh ghi nhan hanh dong Click truoc
                         self.spy_logs.append({
                             'action_type': 'click', 'automation_id': a_id, 'name': name, 'control_type': c_type, 'value': ''
                         })
@@ -146,22 +152,36 @@ jobs:
                     except Exception: pass
 
             def on_press(self, key):
-                if self.is_spying and self.current_focused_element:
+                # 1. Kich hoat phim tat He thong F7 va F8 nhu phien ban cu
+                if key == keyboard.Key.f7:
+                    self.root.after(0, self.toggle_spy)
+                elif key == keyboard.Key.f8:
+                    self.root.after(0, self.toggle_run)
+                
+                # 2. Thu thap tung ky tu go vao o nhap lieu khi dang bat F7
+                elif self.is_spying and self.current_focused_id:
                     try:
                         ch = key.char
                         if ch: self.typed_buffer += str(ch)
                     except AttributeError:
-                        if key == keyboard.Key.space: self.typed_buffer += " "
-                        elif key in [keyboard.Key.enter, keyboard.Key.tab]: self.save_current_typing_buffer()
+                        if key == keyboard.Key.space:
+                            self.typed_buffer += " "
+                        elif key in [keyboard.Key.enter, keyboard.Key.tab]:
+                            self.check_and_save_buffer()
 
-            def save_current_typing_buffer(self):
-                if self.typed_buffer and self.current_focused_element:
-                    if self.spy_logs and self.spy_logs[-1]['automation_id'] == self.current_focused_element['automation_id']:
+            def check_and_save_buffer(self):
+                # Neu phat hien nguoi dung co go chu sau khi click vao o do
+                if self.typed_buffer and self.current_focused_id:
+                    if self.spy_logs and self.spy_logs[-1]['automation_id'] == self.current_focused_id:
+                        # Ghi de hanh dong Click truoc do thanh hanh dong "Nhap lieu" va kem theo Text da go
                         self.spy_logs[-1]['action_type'] = 'type_text'
                         self.spy_logs[-1]['value'] = self.typed_buffer
+                        
+                        # Cap nhat truc tiep len dong cuoi cung tren giao dien
                         children = self.tree.get_children()
                         if children:
-                            self.tree.item(children[-1], values=('Nhap lieu', self.current_focused_element['automation_id'], self.current_focused_element['name'], self.typed_buffer))
+                            self.tree.item(children[-1], values=('Nhap lieu', self.current_focused_id, self.current_focused_name, self.typed_buffer))
+                            self.write_log(f"   ✍️ Tu ghi nhan text: '{self.typed_buffer}' vao ID '{self.current_focused_id}'")
                     self.typed_buffer = ""
 
             def update_tree(self, action, a_id, name, value):
@@ -171,14 +191,14 @@ jobs:
                 if not self.is_running:
                     if self.is_spying: return
                     if not self.spy_logs:
-                        messagebox.showwarning("Canh bao", "Chua co du lieu hanh dong nao duoc ghi nho!")
+                        messagebox.showwarning("Canh bao", "Ban chua thuc hien thao tac lam mau (F7)!")
                         return
                     self.is_running = True
-                    self.btn_run.config(text="⏹️ Dung Vong Lap", bg="#ffcdd2")
+                    self.btn_run.config(text="⏹️ Dung Vong Lap (F8)", bg="#ff3333", fg="white")
                     threading.Thread(target=self.automation_engine, daemon=True).start()
                 else:
                     self.is_running = False
-                    self.btn_run.config(text="▶️ Chay Tu Dong Thich Ung", bg="#c8e6c9")
+                    self.btn_run.config(text="▶️ Chay Tu Dong Auto (F8)", bg="#ccffcc", fg="black")
                     self.write_log("⏹️ DA NGUNG TIEN TRINH TU DONG.")
                     self.kill_process()
 
@@ -187,7 +207,7 @@ jobs:
                     try:
                         p = psutil.Process(self.proc_pid)
                         p.kill()
-                        self.write_log(f"-> Giet thanh cong tien trinh PID: {self.proc_pid}")
+                        self.write_log(f"-> Da tat tien trinh PID: {self.proc_pid}")
                     except: pass
                     self.proc_pid = None
 
@@ -211,31 +231,29 @@ jobs:
                         break
 
                     try:
-                        # KET NOI VAO APP (Sử dụng cơ chế chờ thông minh)
                         app = None
-                        self.write_log("-> [SMART WAIT]: Dang doi phan mem hien cua so giao dien len...")
+                        self.write_log("-> [SMART WAIT]: Dang doi cua so phan mem hien len...")
                         
-                        # Vong lap lien tuc kiem tra moi 1 giay, cho den khi cua so bat len han
+                        # Cho den khi cua so ung dung thuc su bat len han
                         while self.is_running:
                             try:
                                 app = Application(backend="uia").connect(process=self.proc_pid)
                                 main_win = app.top_window()
-                                # Kiem tra thu xem cua so da san sang tuong tac chua
                                 if main_win.exists() and main_win.is_visible():
-                                    self.write_log("   ✓ Da phat hien thay giao dien phần mềm!")
+                                    self.write_log("   ✓ Da ket noi duoc vao giao dien phan mem!")
                                     break
                             except Exception: pass
-                            time.sleep(1) # Neu chua duoc thi cho 1 giay roi thu lai lien tuc
+                            time.sleep(1)
                         
                         if not self.is_running: break
                         main_win = app.top_window()
                         
-                        # THUC THI CAC BUOC
+                        # BAT DAU THUC THI CHUOI HANH DONG
                         for act in self.spy_logs:
                             if not self.is_running: break
                             
                             elem = None
-                            # Vong lap tu dong RETRY cho tung Linh kien/Tab neu no chua kip xuat hien
+                            # Vong lap tu dong doi tung Tab/Nut/O nhap lieu hien ra (Thich ung load cham)
                             while self.is_running:
                                 try:
                                     if act['automation_id'] != "N/A":
@@ -244,32 +262,33 @@ jobs:
                                         elem = main_win.child_window(title=act['name'], control_type=act['control_type'])
                                     
                                     if elem.exists() and elem.is_visible():
-                                        break # Linh kien da xuat hien, thoat vong lap cho de thuc thi
+                                        break
                                 except Exception: pass
-                                time.sleep(0.5) # Neu chua load kip tab thi cho 0.5 giay roi quet lai ngay
+                                time.sleep(0.5)
                             
                             if elem and self.is_running:
                                 if act['action_type'] == 'click':
                                     elem.click_input()
                                     self.write_log(f"   ✓ Click: [{act['control_type']}] '{act['name']}'")
                                 elif act['action_type'] == 'type_text':
-                                    elem.click_input()
-                                    time.sleep(0.2)
-                                    elem.type_keys(act['value'], with_spaces=True, with_tabs=True)
-                                    self.write_log(f"   ✓ Tu dong nhap: '{act['value']}'")
-                                time.sleep(1) # Gian cach an toan giua cac phan tu 1 giay
+                                    elem.click_input() # Kich hoat focus vao o text box
+                                    time.sleep(0.3)
+                                    # Tu dong clear chu cu neu co va dien text moi vao chinh xac theo ID
+                                    elem.type_keys(act['value'], with_spaces=True, with_tabs=True, clear=True)
+                                    self.write_log(f"   ✓ Dien du lieu tu dong: '{act['value']}'")
+                                time.sleep(1.2) # Khoang tre an toan giua cac phan tu UI
                                     
                     except Exception as e:
-                        self.write_log(f"❌ Loi dong bo he thong: {e}")
+                        self.write_log(f"❌ Loi dong bo thuc thi: {e}")
 
                     if not self.is_running: break
-                    self.write_log(f"-> Chu ky hoan tat! Giu ngam phan mem trong {delay_reset} giay...")
+                    self.write_log(f"-> Chu ky xong! Giu trang thai ngam may {delay_reset} giay...")
                     for _ in range(delay_reset):
                         if not self.is_running: break
                         time.sleep(1)
                         
                     if self.is_running:
-                        self.write_log("-> Het thoi gian ngam. Dang tat de lam lai chu ky moi...")
+                        self.write_log("-> Het thoi gian! Dang tat tien trinh phan mem de khoi dong lai...")
                         self.kill_process()
                         time.sleep(2)
                         
@@ -277,22 +296,22 @@ jobs:
 
         if __name__ == "__main__":
             root = tk.Tk()
-            app = SmartRetryAutomationApp(root)
+            app = FinalSmartAutomationApp(root)
             root.mainloop()
         '@
         Out-File -FilePath "main.py" -InputObject $code -Encoding utf8
 
-    - name: 2. Cai Dat Thu Vien Toan Dien
+    - name: 2. Cai Dat Thu Vien He Thong Toan Dien
       run: |
         python -m pip install --upgrade pip
         pip install pynput pywinauto psutil pyinstaller
 
-    - name: 3. Dong Goi File Exe Chuyen Nghiep
+    - name: 3. Dong Goi File Exe Hoan Chinh
       run: |
         python -m PyInstaller --noconfirm --onefile --windowed main.py
 
-    - name: 4. Xuat Ban Chinh Thuc
+    - name: 4. Xuat Thanh Pham
       uses: actions/upload-artifact@v4
       with:
-        name: Tool_Auto_Thich_Ung_SmartWait
+        name: Tool_Auto_Chuan_F7_F8
         path: dist/main.exe
